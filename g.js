@@ -1,3 +1,13 @@
+window.orbitGames = [
+  { name: "2048", category: "Puzzle", url: "https://play2048.co/", mark: "2" },
+  { name: "TETR.IO", category: "Arcade", url: "https://tetr.io/", mark: "T" },
+  { name: "Agar.io", category: "Action", url: "https://agar.io/", mark: "A" },
+  { name: "Diep.io", category: "Action", url: "https://diep.io/", mark: "D" },
+  { name: "Slither.io", category: "Arcade", url: "https://slither.io/", mark: "S" },
+  { name: "Shell Shockers", category: "Shooter", url: "https://shellshock.io/", mark: "S" },
+  { name: "Krunker", category: "Shooter", url: "https://krunker.io/", mark: "K" },
+  { name: "Chess", category: "Strategy", url: "https://chess.org/", mark: "C" },
+];
 async function loadGames() { 
   container.innerHTML = '<div class="empty-state"><i class="fas fa-circle-notch fa-spin"></i><p>Loading games...</p></div>'; 
   allGames = []; 
