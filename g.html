@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Orbit Arcade</title>
+  <meta http-equiv="refresh" content="0; url=scram/public/g.html">
+</head>
+<body><p>Opening <a href="scram/public/g.html">Orbit Arcade</a>...</p></body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orbit Games</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{--bg:#09090b;--surface:#111113;--surface2:#161618;--border:#1e1e22;--text:#e4e4e7;--dim:#52525b;--accent:#a78bfa;--accent-dim:rgba(167,139,250,.08);--accent-mid:rgba(167,139,250,.15)}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+
+  .topbar{position:sticky;top:0;z-index:60;background:rgba(9,9,11,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;height:48px;display:flex;align-items:center;gap:10px}
+  .topbar a{color:var(--dim);text-decoration:none;font-size:13px;font-weight:500;display:flex;align-items:center;gap:6px;transition:color .15s}
+  .topbar a:hover{color:var(--text)}
+  .topbar a svg{width:16px;height:16px}
+  .topbar-title{flex:1;font-size:14px;font-weight:600;color:#fff;letter-spacing:-.01em}
+  .topbar-btn{background:none;border:none;color:var(--dim);cursor:pointer;padding:6px;border-radius:6px;transition:background .15s,color .15s;display:flex;align-items:center}
+  .topbar-btn:hover{background:var(--surface);color:var(--text)}
+  .topbar-btn svg{width:16px;height:16px}
+
+  .main{max-width:960px;margin:0 auto;padding:20px 24px 80px}
+
+  .search-wrap{position:relative;margin-bottom:8px}
+  .search-wrap svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--dim);pointer-events:none}
+  .search-input{width:100%;padding:11px 14px 11px 40px;font-family:inherit;font-size:13px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:#fff;outline:none;transition:border-color .15s}
+  .search-input::placeholder{color:var(--dim)}
+  .search-input:focus{border-color:var(--accent-mid)}
+
+  .count{font-size:12px;color:var(--dim);margin-bottom:16px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+  .card{position:relative;border-radius:10px;overflow:hidden;cursor:pointer;aspect-ratio:4/3;background:var(--surface);border:1px solid var(--border);transition:transform .2s,border-color .2s,box-shadow .2s}
+  .card:hover{transform:translateY(-4px);border-color:var(--accent-mid);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+  .card img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
+  .card:hover img{transform:scale(1.05)}
+  .card-overlay{position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(0,0,0,.7));display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s}
+  .card:hover .card-overlay{opacity:1}
+  .card-play{width:40px;height:40px;border-radius:50%;background:rgba(167,139,250,.9);display:flex;align-items:center;justify-content:center;transition:transform .15s}
+  .card:hover .card-play{transform:scale(1.1)}
+  .card-play svg{width:18px;height:18px;color:#fff;margin-left:2px}
+  .card-info{position:absolute;bottom:0;left:0;right:0;padding:26px 10px 10px;background:linear-gradient(transparent,rgba(0,0,0,.85));pointer-events:none}
+  .card-name{display:block;font-size:12px;font-weight:500;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .card-tag{display:block;font-size:10px;color:var(--dim);margin-top:2px;text-transform:capitalize}
+
+  .empty{grid-column:1/-1;text-align:center;padding:80px 20px;color:var(--dim)}
+  .empty i{font-size:28px;margin-bottom:12px;display:block}
+  .empty p{font-size:13px}
+  .empty .fa-spin{animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* launch */
+  .launch{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;flex-direction:column;opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s}
+  .launch.open{opacity:1;visibility:visible}
+  .launch-bar{height:44px;flex-shrink:0;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:10px}
+  .launch-bar .l-name{flex:1;font-size:13px;font-weight:500;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .launch-bar .l-url{font-size:11px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px}
+  .launch-close{background:none;border:none;color:var(--dim);cursor:pointer;padding:6px;border-radius:6px;transition:background .15s,color .15s;display:flex;align-items:center}
+  .launch-close:hover{background:var(--border);color:#fff}
+  .launch-close svg{width:16px;height:16px}
+  .launch-frame{flex:1;border:none;background:#000;width:100%}
+
+  /* settings */
+  .modal-bg{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s}
+  .modal-bg.open{opacity:1;visibility:visible}
+  .modal{width:90%;max-width:420px;background:#18181b;border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 24px 48px rgba(0,0,0,.5)}
+  .modal-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .modal-head span{font-size:14px;font-weight:600;color:#fff}
+  .modal-head button{background:none;border:none;color:var(--dim);cursor:pointer;padding:4px;border-radius:4px;display:flex;transition:color .15s}
+  .modal-head button:hover{color:#fff}
+  .modal-head button svg{width:16px;height:16px}
+  .modal-body{padding:18px}
+  .modal-label{font-size:12px;font-weight:500;color:var(--dim);margin-bottom:8px;display:block}
+  .modal-input{width:100%;padding:9px 12px;font-family:inherit;font-size:13px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:#fff;outline:none;transition:border-color .15s}
+  .modal-input:focus{border-color:var(--accent-mid)}
+  .modal-input::placeholder{color:#3f3f46}
+  .modal-hint{font-size:11px;color:#3f3f46;margin-top:6px;line-height:1.5}
+  .modal-foot{padding:12px 18px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+  .btn-ghost{padding:7px 16px;font-family:inherit;font-size:12px;font-weight:500;background:none;border:1px solid var(--border);border-radius:8px;color:var(--text);cursor:pointer;transition:background .15s}
+  .btn-ghost:hover{background:var(--surface)}
+  .btn-accent{padding:7px 16px;font-family:inherit;font-size:12px;font-weight:500;background:var(--accent);border:none;border-radius:8px;color:#fff;cursor:pointer;transition:opacity .15s}
+  .btn-accent:hover{opacity:.85}
+
+  @media(max-width:480px){.grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}.main{padding:16px 16px 64px}.launch-bar .l-url{display:none}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Orbit
+  </a>
+  <span class="topbar-title">Games</span>
+  <button class="topbar-btn" id="settingsBtn" title="Settings">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+  </button>
+</div>
+
+<div class="main">
+  <div class="search-wrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" class="search-input" id="searchInput" placeholder="Search games..." autocomplete="off" spellcheck="false">
+  </div>
+  <div class="count" id="count"></div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<!-- launch -->
+<div class="launch" id="launch">
+  <div class="launch-bar">
+    <span class="l-name" id="launchName"></span>
+    <span class="l-url" id="launchUrl"></span>
+    <button class="launch-close" id="launchClose">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <iframe class="launch-frame" id="launchFrame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups" allowfullscreen></iframe>
+</div>
+
+<!-- settings -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <div class="modal-head">
+      <span>Settings</span>
+      <button id="modalClose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <label class="modal-label">Scramjet Worker URL</label>
+      <input type="text" class="modal-input" id="proxyInput" placeholder="https://your-worker.workers.dev">
+      <div class="modal-hint">Games will be proxied through this URL to bypass network restrictions. Leave empty to load game URLs directly.</div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" id="modalCancel">Cancel</button>
+      <button class="btn-accent" id="modalSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── elements ── */
+const searchInput = document.getElementById('searchInput');
+const countEl = document.getElementById('count');
+const gridEl = document.getElementById('grid');
+const launchEl = document.getElementById('launch');
+const launchFrame = document.getElementById('launchFrame');
+const launchName = document.getElementById('launchName');
+const launchUrl = document.getElementById('launchUrl');
+const launchClose = document.getElementById('launchClose');
+const proxyInput = document.getElementById('proxyInput');
+
+/* ── state ── */
+let allGames = [];
+let scramjetUrl = localStorage.getItem('orbit_scramjet') || '';
+proxyInput.value = scramjetUrl;
+
+function proxify(url) {
+  if (!scramjetUrl || !url) return url;
+  const base = scramjetUrl.replace(/\/+$/, '');
+  return base + '?url=' + encodeURIComponent(url);
+}
+
+function getFallbackImage(name) {
+  const letter = (name || '?').charAt(0).toUpperCase();
+  const colors = ['#6c5ce7','#00cec9','#e17055','#fdcb6e','#e84393','#00b894','#0984e3','#d63031'];
+  const c = colors[(name || '').length % colors.length];
+  return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect fill="#111113" width="400" height="300"/><text x="200" y="165" text-anchor="middle" fill="${c}" font-size="72" font-family="sans-serif" font-weight="600">${letter}</text></svg>`)}`;
+}
+
+/* ── load games from g.js ── */
+async function loadGames() {
+  gridEl.innerHTML = '<div class="empty"><i class="fas fa-circle-notch fa-spin"></i><p>Loading games...</p></div>';
+  countEl.textContent = '';
+  allGames = [];
+
+  try {
+    const res = await fetch('https://cdn.jsdelivr.net/gh/viroda1/orbit-data/g.js');
+    const text = await res.text();
+
+    let data;
+    /* try direct JSON parse first */
+    try {
+      data = JSON.parse(text);
+    } catch {
+      /* extract array from JS assignment like var games = [...] or module.exports = [...] */
+      const match = text.match(/(\[[\s\S]*\])/);
+      if (match) {
+        data = JSON.parse(match[1]);
+      } else {
+        throw new Error('Could not parse game data');
+      }
+    }
+
+    /* normalize — handle array or object with games key */
+    const arr = Array.isArray(data) ? data : (data.games || data.data || []);
+
+    allGames = arr.map((g, i) => {
+      const name = g.name || g.title || g.label || 'Unknown';
+      let url = g.url || g.link || g.html || '';
+      let cover = g.cover || g.image || g.img || g.thumbnail || g.icon || '';
+      const tag = g.category || g.tag || g.type || g.provider || '';
+
+      /* ensure absolute cover URL */
+      if (cover && !cover.startsWith('http')) {
+        /* try common base patterns */
+        if (cover.startsWith('./') || cover.startsWith('/')) cover = cover.replace(/^\.\//, '');
+        if (!cover.startsWith('http')) cover = 'https://cdn.jsdelivr.net/gh/viroda1/orbit-data/' + cover;
+      }
+
+      return {
+        name,
+        url,
+        cover: cover || getFallbackImage(name),
+        tag,
+        order: i
+      };
+    }).filter(g => g.name && g.name !== 'Unknown');
+
+    applyFilters();
+
+  } catch (e) {
+    console.error('Failed to load games:', e);
+    gridEl.innerHTML = `<div class="empty"><i class="fas fa-exclamation-triangle" style="color:#ff4444"></i><p style="color:#ff4444">Failed to load games.</p><p style="margin-top:6px;font-size:11px;color:#3f3f46">${e.message}</p></div>`;
+  }
+}
+
+/* ── filter & render ── */
+function applyFilters() {
+  const q = searchInput.value.toLowerCase().trim();
+  let filtered = allGames;
+  if (q) filtered = filtered.filter(g => g.name.toLowerCase().includes(q) || (g.tag || '').toLowerCase().includes(q));
+  countEl.textContent = filtered.length + ' game' + (filtered.length !== 1 ? 's' : '');
+  renderGames(filtered);
+}
+
+function renderGames(games) {
+  if (!games.length) {
+    gridEl.innerHTML = '<div class="empty"><i class="fas fa-search"></i><p>No games found.</p></div>';
+    return;
+  }
+  gridEl.innerHTML = games.map(g => `
+    <div class="card" data-url="${(g.url||'').replace(/"/g,'&quot;')}" data-name="${g.name.replace(/"/g,'&quot;')}">
+      <img src="${g.cover}" loading="lazy" onerror="this.src='${getFallbackImage(g.name)}'">
+      <div class="card-overlay"><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg></div></div>
+      <div class="card-info">
+        <span class="card-name">${g.name}</span>
+        ${g.tag ? `<span class="card-tag">${g.tag}</span>` : ''}
+      </div>
+    </div>
+  `).join('');
+
+  gridEl.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', () => {
+      const url = card.dataset.url;
+      const name = card.dataset.name;
+      if (!url) return;
+      launchName.textContent = name;
+      launchUrl.textContent = url;
+      launchFrame.src = '';
+      launchEl.classList.add('open');
+      launchFrame.src = proxify(url);
+    });
+  });
+}
+
+searchInput.addEventListener('input', applyFilters);
+
+/* ── launch close ── */
+function closeLaunch() { launchEl.classList.remove('open'); launchFrame.src = ''; }
+launchClose.addEventListener('click', closeLaunch);
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (launchEl.classList.contains('open')) closeLaunch();
+    else if (document.getElementById('modalBg').classList.contains('open')) document.getElementById('modalBg').classList.remove('open');
+  }
+});
+
+/* ── settings ── */
+const modalBg = document.getElementById('modalBg');
+document.getElementById('settingsBtn').addEventListener('click', () => { proxyInput.value = scramjetUrl; modalBg.classList.add('open'); });
+document.getElementById('modalClose').addEventListener('click', () => modalBg.classList.remove('open'));
+document.getElementById('modalCancel').addEventListener('click', () => modalBg.classList.remove('open'));
+modalBg.addEventListener('click', e => { if (e.target === modalBg) modalBg.classList.remove('open'); });
+document.getElementById('modalSave').addEventListener('click', () => {
+  scramjetUrl = proxyInput.value.trim();
+  localStorage.setItem('orbit_scramjet', scramjetUrl);
+  modalBg.classList.remove('open');
+});
+
+/* ── init ── */
+loadGames();
+</script>
+</body>
+</html>
