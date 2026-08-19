@@ -22,7 +22,8 @@ in the meantime here is some popular websites that people visit;
 Orbit proxy uses scramjet to view the internet via CORS bypassing
 setup/use
 
-inorder to use orbit, just clone the git into your repo(beginner) and host it on GitHub, or download the zip(advanced), and host it on other website hosting providers.
+inorder to use orbit, just clone the git into your repo(beginner) via gh repo clone viroda1/orbit-data
+and host it on GitHub, or download the zip(advanced), and host it on other website hosting providers.
 Resources for self-hosting:
 - https://github.com/nvm-sh/nvm
 - https://docs.titaniumnetwork.org/guides/nginx/
