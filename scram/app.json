@@ -1,0 +1,7 @@
+{
+	"name": "Orbit Proxy",
+	"description": "Orbit is a themed private browsing, games, and thinking hub powered by Scramjet.",
+	"repository": "https://github.com/viroda1/orbit-data",
+	"logo": "https://raw.githubusercontent.com/viroda1/orbit-data/main/scram/public/orbit.svg",
+	"keywords": ["orbit", "scramjet", "proxy", "games", "argon"]
+}
